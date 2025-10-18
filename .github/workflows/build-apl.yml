@@ -3,40 +3,6 @@ name: Build Kivy APK
 on:
   push:
     branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up environment
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y openjdk-17-jdk python3-pip git unzip zip libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev ccache
-          pip install --upgrade pip setuptools wheel Cython virtualenv
-          pip install buildozer==1.5.0 python-for-android==2025.2.11
-
-      - name: Build APK
-        run: |
-          cd victorina
-          sed -i 's/^android.ndk.*/android.ndk = 27b/' buildozer.spec || true
-          sed -i 's/^android.arch.*/android.arch = armeabi-v7a/' buildozer.spec || true
-          buildozer -v android debug
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: victorina-apk
-          path: victorina/bin/*.apk
-pip install buildozer==1.5.0 python-for-android==2024.1.21
-name: Build Kivy APK
-
-on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -77,7 +43,7 @@ jobs:
           buildozer android clean
           buildozer -v android debug
 
-      - name: Rename and upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: victorina-apk
