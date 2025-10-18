@@ -23,12 +23,13 @@ jobs:
           restore-keys: |
             buildozer-${{ runner.os }}-
 
-      - name: Set up environment
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y openjdk-17-jdk python3-pip git unzip zip libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev ccache
-          pip install --upgrade pip setuptools wheel Cython virtualenv
-          pip install buildozer==1.5.0 python-for-android==2024.1.21
+       - name: Set up environment
+  run: |
+    sudo apt-get update -qq
+    sudo apt-get install -y openjdk-17-jdk python3-pip git unzip zip libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev ccache
+    pip install --upgrade pip wheel Cython virtualenv
+    pip install setuptools==68.0.0
+    pip install buildozer==1.5.0 python-for-android==2024.1.21
 
       - name: Prepare project
         run: |
