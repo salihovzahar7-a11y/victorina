@@ -31,3 +31,54 @@ jobs:
         with:
           name: victorina-apk
           path: victorina/bin/*.apk
+pip install buildozer==1.5.0 python-for-android==2024.1.21
+name: Build Kivy APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Android SDK/NDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            /root/.buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('victorina/buildozer.spec') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
+
+      - name: Set up environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y openjdk-17-jdk python3-pip git unzip zip libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev ccache
+          pip install --upgrade pip setuptools wheel Cython virtualenv
+          pip install buildozer==1.5.0 python-for-android==2024.1.21
+
+      - name: Prepare project
+        run: |
+          cd victorina
+          sed -i 's/^android.ndk.*/android.ndk = 27b/' buildozer.spec || true
+          sed -i 's/^android.arch.*/android.arch = armeabi-v7a/' buildozer.spec || true
+          sed -i 's/^requirements.*/requirements = python3,kivy==2.3.0,sqlite3/' buildozer.spec || true
+
+      - name: Build APK
+        run: |
+          cd victorina
+          buildozer android clean
+          buildozer -v android debug
+
+      - name: Rename and upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: victorina-apk
+          path: victorina/bin/*.apk
